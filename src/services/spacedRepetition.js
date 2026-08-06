@@ -29,7 +29,7 @@ export function getTodayDateString() {
 export function isItemDueForRevision(item, todayStr = getTodayDateString()) {
   if (item.revisionFlag) return true; // Manual override checkbox ☑ Rev
   if (!item.done) return false;
-  if (!item.nextDue) return true;
+  if (!item.nextDue) return false;
   return item.nextDue <= todayStr;
 }
 
