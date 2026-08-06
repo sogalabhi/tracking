@@ -13,6 +13,7 @@ import { DataView } from './components/data/DataView';
 import { HelpView } from './components/help/HelpView';
 import { ShortcutModal } from './components/common/ShortcutModal';
 import { ActiveTimerModal } from './components/timer/ActiveTimerModal';
+import { useGlobalKeyboardShortcuts } from './hooks/useGlobalKeyboardShortcuts';
 
 function MainContent() {
   return (
@@ -35,6 +36,7 @@ function MainContent() {
 
 function AppShell() {
   const { theme } = useApp();
+  useGlobalKeyboardShortcuts();
 
   return (
     <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${

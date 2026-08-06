@@ -58,15 +58,23 @@ export function useKeyboardShortcuts({ visibleItems = [], onFocusSearch = null, 
 
       if (e.key === 'j' || e.key === 'ArrowDown') {
         e.preventDefault();
-        const nextIdx = currentIndex < visibleItems.length - 1 ? currentIndex + 1 : 0;
-        setSelectedItemId(visibleItems[nextIdx].id);
+        if (currentIndex < 0) {
+          setSelectedItemId(visibleItems[0].id);
+        } else {
+          const nextIdx = currentIndex < visibleItems.length - 1 ? currentIndex + 1 : 0;
+          setSelectedItemId(visibleItems[nextIdx].id);
+        }
         return;
       }
 
       if (e.key === 'k' || e.key === 'ArrowUp') {
         e.preventDefault();
-        const prevIdx = currentIndex > 0 ? currentIndex - 1 : visibleItems.length - 1;
-        setSelectedItemId(visibleItems[prevIdx].id);
+        if (currentIndex < 0) {
+          setSelectedItemId(visibleItems[visibleItems.length - 1].id);
+        } else {
+          const prevIdx = currentIndex > 0 ? currentIndex - 1 : visibleItems.length - 1;
+          setSelectedItemId(visibleItems[prevIdx].id);
+        }
         return;
       }
 
