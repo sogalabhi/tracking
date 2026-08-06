@@ -34,7 +34,7 @@ export function ColdRecallGate({ item, onClearGate }) {
 
         <div>
           <p className="text-[11px] font-bold text-slate-400 mb-1">Your Stated Approach:</p>
-          <p className="text-xs font-mono text-emerald-300 bg-slate-900 p-2 rounded border border-slate-800">
+          <p className="text-xs font-mono text-white bg-slate-900 p-2.5 rounded border border-slate-800">
             "{recallInput}"
           </p>
         </div>
@@ -42,7 +42,7 @@ export function ColdRecallGate({ item, onClearGate }) {
         {item.notes && (
           <div>
             <p className="text-[11px] font-bold text-slate-400 mb-1">Official Notes / Solution:</p>
-            <p className="text-xs text-slate-200 bg-slate-900 p-2.5 rounded border border-slate-800 font-mono whitespace-pre-wrap">
+            <p className="text-xs text-white bg-slate-900 p-2.5 rounded border border-slate-800 font-mono whitespace-pre-wrap">
               {item.notes}
             </p>
           </div>
@@ -70,7 +70,7 @@ export function ColdRecallGate({ item, onClearGate }) {
             value={recallInput}
             onChange={(e) => setRecallInput(e.target.value)}
             placeholder="E.g. Binary search on answer space, bounds 1 to max(arr)..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs placeholder-slate-600 focus:outline-none focus:border-indigo-500 font-mono"
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-indigo-500 font-mono"
           />
         </div>
 
