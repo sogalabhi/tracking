@@ -3,9 +3,11 @@ import { ChevronDown, ChevronRight, Play } from 'lucide-react';
 import { SubtopicGroup } from './SubtopicGroup';
 import { useTimer } from '../../context/TimerContext';
 
-export function TopicAccordion({ topic, subtopics, items }) {
-  const [isOpen, setIsOpen] = useState(true);
+export function TopicAccordion({ topic, subtopics, items, forceOpen = null }) {
+  const [isOpen, setIsOpen] = useState(false);
   const { startTimer, activeTimer } = useTimer();
+
+  const isExpanded = forceOpen !== null ? forceOpen : isOpen;
 
   const totalCount = items.length;
   const solvedCount = items.filter((i) => i.done).length;
@@ -15,12 +17,12 @@ export function TopicAccordion({ topic, subtopics, items }) {
     <div className="mb-6 bg-slate-900 border border-slate-800 rounded-2xl overflow-hidden shadow-lg">
       {/* Accordion Header */}
       <div
-        onClick={() => setIsOpen(!isOpen)}
+        onClick={() => setIsOpen(!isExpanded)}
         className="p-4 bg-slate-900 flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-all border-b border-slate-800/60"
       >
         <div className="flex items-center gap-3">
           <div className="text-slate-400">
-            {isOpen ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
+            {isExpanded ? <ChevronDown className="w-5 h-5" /> : <ChevronRight className="w-5 h-5" />}
           </div>
           <div>
             <h3 className="text-sm font-extrabold text-white flex items-center gap-2">
@@ -68,7 +70,7 @@ export function TopicAccordion({ topic, subtopics, items }) {
       </div>
 
       {/* Accordion Body */}
-      {isOpen && (
+      {isExpanded && (
         <div className="p-4 bg-slate-950/40">
           {subtopics.map((subtopic) => {
             const subItems = items.filter((i) => i.subtopicId === subtopic.id);

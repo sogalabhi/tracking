@@ -26,6 +26,8 @@ export function TrackerView() {
     [items, selectedSubject]
   );
 
+  const [expandAll, setExpandAll] = useState(false);
+
   // Filtered Items logic
   const filteredItems = useMemo(() => {
     return currentSubjectItems.filter((item) => {
@@ -53,21 +55,33 @@ export function TrackerView() {
     onFocusSearch: () => searchInputRef.current?.focus()
   });
 
+  const forceOpenState = searchQuery.trim() ? true : expandAll ? true : null;
+
   return (
     <div className="space-y-6">
       {/* Sticky Filter Bar */}
       <div className="bg-slate-900 border border-slate-800 rounded-2xl p-4 shadow-lg sticky top-20 z-30 flex flex-col md:flex-row items-center justify-between gap-4">
         {/* Search Input */}
-        <div className="relative flex-1 w-full">
-          <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
-          <input
-            ref={searchInputRef}
-            type="text"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search problems, keywords, or notes... (Press '/')"
-            className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
-          />
+        <div className="relative flex-1 w-full flex items-center gap-2">
+          <div className="relative flex-1">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              ref={searchInputRef}
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search problems, keywords, or notes... (Press '/')"
+              className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-indigo-500 font-mono"
+            />
+          </div>
+          {/* Expand / Collapse All Toggle */}
+          <button
+            onClick={() => setExpandAll(!expandAll)}
+            className="px-3 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 rounded-xl text-xs text-slate-400 font-semibold whitespace-nowrap transition-colors"
+            title="Expand or collapse all topic accordions"
+          >
+            {expandAll ? 'Collapse All' : 'Expand All'}
+          </button>
         </div>
 
         {/* Filter Pills */}
@@ -110,6 +124,7 @@ export function TrackerView() {
               topic={topic}
               subtopics={topicSubtopics}
               items={topicItems}
+              forceOpen={forceOpenState}
             />
           );
         })}
@@ -117,3 +132,4 @@ export function TrackerView() {
     </div>
   );
 }
+  
