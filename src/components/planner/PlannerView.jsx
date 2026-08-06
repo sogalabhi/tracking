@@ -100,7 +100,7 @@ export function PlannerView() {
 
                 <div className="space-y-2 min-h-[120px]">
                   {dayPlans.length === 0 ? (
-                    <p className="text-[11px] text-slate-600 text-center py-8 italic">
+                    <p className="text-[11px] text-white text-center py-8 italic">
                       No tasks planned
                     </p>
                   ) : (

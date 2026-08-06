@@ -16,7 +16,7 @@ export function TopicAccordion({ topic, subtopics, items }) {
       {/* Accordion Header */}
       <div
         onClick={() => setIsOpen(!isOpen)}
-        className="p-4 bg-gradient-to-r from-slate-900 via-slate-900 to-slate-950 flex items-center justify-between cursor-pointer hover:bg-slate-850 transition-all border-b border-slate-800/60"
+        className="p-4 bg-slate-900 flex items-center justify-between cursor-pointer hover:bg-slate-800 transition-all border-b border-slate-800/60"
       >
         <div className="flex items-center gap-3">
           <div className="text-slate-400">

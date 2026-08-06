@@ -39,7 +39,7 @@ export function CalendarView() {
       case 3:
         return 'bg-emerald-600 text-white border-emerald-400 font-extrabold shadow-lg shadow-emerald-600/30';
       case 4:
-        return 'bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white border-indigo-400 font-extrabold shadow-xl shadow-indigo-500/40 animate-pulse-subtle';
+        return 'bg-indigo-600 text-white border-indigo-400 font-extrabold shadow-xl shadow-indigo-500/40 animate-pulse-subtle';
       default:
         return 'bg-slate-950 text-slate-500 border-slate-850 hover:bg-slate-900 hover:text-slate-300';
     }
@@ -50,7 +50,7 @@ export function CalendarView() {
       {/* Calendar Header */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-3 bg-gradient-to-tr from-indigo-600 to-emerald-500 text-white rounded-2xl shadow-lg shadow-indigo-600/30">
+          <div className="p-3 bg-indigo-600 text-white rounded-2xl shadow-lg shadow-indigo-600/30">
             <CalendarIcon className="w-6 h-6" />
           </div>
           <div>
@@ -138,7 +138,7 @@ export function CalendarView() {
           <div className="w-3 h-3 rounded bg-emerald-950 border border-emerald-800" />
           <div className="w-3 h-3 rounded bg-emerald-800" />
           <div className="w-3 h-3 rounded bg-emerald-600" />
-          <div className="w-3 h-3 rounded bg-gradient-to-tr from-indigo-600 to-emerald-500" />
+          <div className="w-3 h-3 rounded bg-indigo-600" />
           <span>More (8h+)</span>
         </div>
       </div>

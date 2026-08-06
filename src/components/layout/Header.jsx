@@ -76,8 +76,8 @@ export function Header() {
           {/* Logo & Streak */}
           <div className="flex items-center gap-3">
             <div className="flex items-center gap-2">
-              <div className="p-2 bg-gradient-to-tr from-indigo-600 to-purple-600 rounded-lg shadow-lg shadow-indigo-500/20">
-                <Flame className="w-5 h-5 text-white" />
+              <div className="p-2 bg-indigo-600 rounded-lg shadow-md text-white">
+                <Flame className="w-5 h-5" />
               </div>
               <div>
                 <h1 className="font-extrabold text-base tracking-tight text-white flex items-center gap-2">
@@ -161,7 +161,7 @@ export function Header() {
                 </div>
                 <div className="h-1.5 w-full bg-slate-800 rounded-full overflow-hidden">
                   <div
-                    className="h-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-500 rounded-full"
+                    className="h-full bg-indigo-600 transition-all duration-500 rounded-full"
                     style={{ width: `${Math.min((todayHours / targetMin) * 100, 100)}%` }}
                   />
                 </div>

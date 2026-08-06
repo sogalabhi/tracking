@@ -17,7 +17,7 @@
 }
 
 /* ==========================================================================
-   STRICT DARK MODE PALETTE (Carbon Black, Charcoal Brown, Spicy Paprika, Floral White, Silver)
+   STRICT DARK MODE PALETTE (Carbon Black #252422, Charcoal Brown #403d39, Spicy Paprika #eb5e28, Floral White #fffcf2, Silver #ccc5b9)
    ========================================================================== */
 .theme-dark {
   background-color: #252422 !important;
@@ -75,7 +75,7 @@
   border-color: #524f4a !important;
 }
 
-/* Re-route ALL Indigo / Emerald / Rose / Purple / Accent classes strictly to Spicy Paprika & Silver */
+/* Primary Accents -> Spicy Paprika #eb5e28 */
 .theme-dark .bg-indigo-600,
 .theme-dark .bg-indigo-500,
 .theme-dark .bg-emerald-600,
@@ -84,7 +84,7 @@
 .theme-dark .bg-purple-600 {
   background-color: #eb5e28 !important;
   color: #ffffff !important;
-  border-color: #f07443 !important;
+  border-color: #eb5e28 !important;
 }
 
 .theme-dark .bg-indigo-600\/15,
@@ -137,7 +137,7 @@
 }
 
 /* ==========================================================================
-   STRICT LIGHT MODE PASTEL PALETTE (Pink Orchid, Pastel Petal, Blush Pop, Icy Blue, Sky Blue)
+   STRICT LIGHT MODE PASTEL PALETTE (Icy Blue #bde0fe, Pink Orchid #cdb4db, Pastel Petal #ffc8dd, Blush Pop #ffafcc, Sky Blue #a2d2ff)
    ========================================================================== */
 .theme-light {
   background-color: #bde0fe !important;
@@ -198,7 +198,6 @@
   border-color: #ffafcc !important;
 }
 
-/* Re-route ALL Indigo / Emerald / Rose / Purple / Accent classes strictly to Sky Blue, Blush Pop, Pastel Petal */
 .theme-light .bg-indigo-600,
 .theme-light .bg-indigo-500,
 .theme-light .bg-emerald-600,
