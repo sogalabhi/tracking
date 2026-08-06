@@ -45,7 +45,7 @@ export function TodayView() {
   return (
     <div className="space-y-6">
       {/* Top Banner: Today Time Budget vs Target */}
-      <div className="bg-gradient-to-r from-slate-900 via-slate-900 to-indigo-950/60 border border-slate-800 rounded-3xl p-6 shadow-xl relative overflow-hidden">
+      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl relative overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="space-y-2">
             <div className="flex items-center gap-2">
