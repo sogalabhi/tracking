@@ -70,7 +70,7 @@ export function ColdRecallGate({ item, onClearGate }) {
             value={recallInput}
             onChange={(e) => setRecallInput(e.target.value)}
             placeholder="E.g. Binary search on answer space, bounds 1 to max(arr)..."
-            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs text-slate-200 placeholder-slate-600 focus:outline-none focus:border-indigo-500 font-mono"
+            className="w-full bg-slate-900 border border-slate-800 rounded-lg p-2.5 text-xs placeholder-slate-600 focus:outline-none focus:border-indigo-500 font-mono"
           />
         </div>
 
