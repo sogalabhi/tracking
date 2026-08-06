@@ -184,6 +184,13 @@ export function AppProvider({ children }) {
     }));
   };
 
+  const deleteSession = (sessionId) => {
+    setData((prev) => ({
+      ...prev,
+      sessions: prev.sessions.filter((s) => s.id !== sessionId)
+    }));
+  };
+
   const updateSettings = (newSettings) => {
     setData((prev) => ({
       ...prev,
