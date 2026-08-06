@@ -11,6 +11,7 @@ import {
   BarChart2,
   Clock
 } from 'lucide-react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import { SUBJECTS } from '../../data/seedData';
 import { useApp } from '../../context/AppContext';
 import { useTimer } from '../../context/TimerContext';
@@ -28,9 +29,18 @@ const ICON_MAP = {
 export function Sidebar() {
   const { selectedSubject, setSelectedSubject, items, sessions } = useApp();
   const { startTimer, activeTimer } = useTimer();
+  const location = useLocation();
+  const navigate = useNavigate();
 
   const todayStr = new Date().toISOString().split('T')[0];
   const todaySeconds = getTotalSecondsForDate(sessions, todayStr);
+
+  const handleSelectSubject = (subId) => {
+    setSelectedSubject(subId);
+    if (location.pathname !== '/tracker') {
+      navigate('/tracker');
+    }
+  };
 
   return (
     <aside className="w-64 bg-slate-900 border-r border-slate-800 p-4 hidden md:flex flex-col justify-between h-[calc(100vh-4rem)] sticky top-16">
@@ -49,7 +59,7 @@ export function Sidebar() {
               return (
                 <div
                   key={sub.id}
-                  onClick={() => setSelectedSubject(sub.id)}
+                  onClick={() => handleSelectSubject(sub.id)}
                   className={`group flex items-center justify-between p-2.5 rounded-xl cursor-pointer transition-all ${
                     isSelected
                       ? 'bg-indigo-600/15 border border-indigo-500/40 text-white'

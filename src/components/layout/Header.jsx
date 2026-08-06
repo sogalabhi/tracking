@@ -15,6 +15,7 @@ import {
   Sun,
   Moon
 } from 'lucide-react';
+import { Link, useLocation } from 'react-router-dom';
 import { useApp } from '../../context/AppContext';
 import { useTimer } from '../../context/TimerContext';
 import { getDueRevisionQueue } from '../../services/spacedRepetition';
@@ -22,8 +23,6 @@ import { getTotalSecondsForDate, calculateStudyStreak } from '../../services/ana
 
 export function Header() {
   const {
-    activeTab,
-    setActiveTab,
     items,
     sessions,
     settings,
@@ -31,6 +30,8 @@ export function Header() {
     toggleTheme,
     setShowShortcutModal
   } = useApp();
+
+  const location = useLocation();
 
   const {
     activeTimer,
@@ -60,14 +61,14 @@ export function Header() {
   }
 
   const tabs = [
-    { id: 'today', label: 'Today', icon: CalendarCheck },
-    { id: 'tracker', label: 'Tracker', icon: LayoutGrid },
-    { id: 'planner', label: 'Planner', icon: CalendarDays },
-    { id: 'revision', label: 'Revision', icon: RotateCcw, badge: dueQueueCount },
-    { id: 'calendar', label: 'Calendar', icon: Clock },
-    { id: 'insights', label: 'Insights', icon: BarChart3 },
-    { id: 'data', label: 'Data', icon: Database },
-    { id: 'help', label: 'Help', icon: HelpCircle }
+    { id: 'today', label: 'Today', icon: CalendarCheck, path: '/today' },
+    { id: 'tracker', label: 'Tracker', icon: LayoutGrid, path: '/tracker' },
+    { id: 'planner', label: 'Planner', icon: CalendarDays, path: '/planner' },
+    { id: 'revision', label: 'Revision', icon: RotateCcw, badge: dueQueueCount, path: '/revision' },
+    { id: 'calendar', label: 'Calendar', icon: Clock, path: '/calendar' },
+    { id: 'insights', label: 'Insights', icon: BarChart3, path: '/insights' },
+    { id: 'data', label: 'Data', icon: Database, path: '/data' },
+    { id: 'help', label: 'Help', icon: HelpCircle, path: '/help' }
   ];
 
   return (
@@ -76,7 +77,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16 gap-4">
           {/* Logo & Streak */}
           <div className="flex items-center gap-3">
-            <div className="flex items-center gap-2">
+            <Link to="/today" className="flex items-center gap-2">
               <div className="p-2 bg-indigo-600 rounded-lg shadow-md text-white">
                 <Flame className="w-5 h-5" />
               </div>
@@ -88,7 +89,7 @@ export function Header() {
                   </span>
                 </h1>
               </div>
-            </div>
+            </Link>
 
             {/* Streak Counter */}
             <div
@@ -207,11 +208,11 @@ export function Header() {
         <nav className="flex space-x-1 overflow-x-auto pb-2 scrollbar-none border-t border-slate-800/60 pt-2">
           {tabs.map((tab) => {
             const Icon = tab.icon;
-            const isActive = activeTab === tab.id;
+            const isActive = location.pathname === tab.path || (tab.path === '/today' && location.pathname === '/');
             return (
-              <button
+              <Link
                 key={tab.id}
-                onClick={() => setActiveTab(tab.id)}
+                to={tab.path}
                 className={`flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap transition-all ${
                   isActive
                     ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30'
@@ -229,7 +230,7 @@ export function Header() {
                     {tab.badge}
                   </span>
                 )}
-              </button>
+              </Link>
             );
           })}
         </nav>

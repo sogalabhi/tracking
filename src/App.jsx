@@ -1,4 +1,4 @@
-import React from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AppProvider, useApp } from './context/AppContext';
 import { TimerProvider } from './context/TimerContext';
 import { Header } from './components/layout/Header';
@@ -15,18 +15,20 @@ import { ShortcutModal } from './components/common/ShortcutModal';
 import { ActiveTimerModal } from './components/timer/ActiveTimerModal';
 
 function MainContent() {
-  const { activeTab } = useApp();
-
   return (
     <main className="flex-1 p-4 md:p-6 lg:p-8 max-w-7xl mx-auto w-full">
-      {activeTab === 'today' && <TodayView />}
-      {activeTab === 'tracker' && <TrackerView />}
-      {activeTab === 'planner' && <PlannerView />}
-      {activeTab === 'revision' && <RevisionView />}
-      {activeTab === 'calendar' && <CalendarView />}
-      {activeTab === 'insights' && <InsightsView />}
-      {activeTab === 'data' && <DataView />}
-      {activeTab === 'help' && <HelpView />}
+      <Routes>
+        <Route path="/" element={<Navigate to="/today" replace />} />
+        <Route path="/today" element={<TodayView />} />
+        <Route path="/tracker" element={<TrackerView />} />
+        <Route path="/planner" element={<PlannerView />} />
+        <Route path="/revision" element={<RevisionView />} />
+        <Route path="/calendar" element={<CalendarView />} />
+        <Route path="/insights" element={<InsightsView />} />
+        <Route path="/data" element={<DataView />} />
+        <Route path="/help" element={<HelpView />} />
+        <Route path="*" element={<Navigate to="/today" replace />} />
+      </Routes>
     </main>
   );
 }
@@ -53,10 +55,12 @@ function AppShell() {
 
 export default function App() {
   return (
-    <AppProvider>
-      <TimerProvider>
-        <AppShell />
-      </TimerProvider>
-    </AppProvider>
+    <BrowserRouter>
+      <AppProvider>
+        <TimerProvider>
+          <AppShell />
+        </TimerProvider>
+      </AppProvider>
+    </BrowserRouter>
   );
 }
