@@ -10,6 +10,7 @@ import { RevisionView } from './components/revision/RevisionView';
 import { CalendarView } from './components/calendar/CalendarView';
 import { InsightsView } from './components/insights/InsightsView';
 import { DataView } from './components/data/DataView';
+import { HelpView } from './components/help/HelpView';
 import { ShortcutModal } from './components/common/ShortcutModal';
 import { ActiveTimerModal } from './components/timer/ActiveTimerModal';
 
@@ -25,6 +26,7 @@ function MainContent() {
       {activeTab === 'calendar' && <CalendarView />}
       {activeTab === 'insights' && <InsightsView />}
       {activeTab === 'data' && <DataView />}
+      {activeTab === 'help' && <HelpView />}
     </main>
   );
 }

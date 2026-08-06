@@ -66,7 +66,8 @@ export function Header() {
     { id: 'revision', label: 'Revision', icon: RotateCcw, badge: dueQueueCount },
     { id: 'calendar', label: 'Calendar', icon: Clock },
     { id: 'insights', label: 'Insights', icon: BarChart3 },
-    { id: 'data', label: 'Data', icon: Database }
+    { id: 'data', label: 'Data', icon: Database },
+    { id: 'help', label: 'Help', icon: HelpCircle }
   ];
 
   return (
