@@ -29,10 +29,46 @@ export function loadInitialAppData() {
     const rawPlans = localStorage.getItem(STORAGE_KEYS.DAILY_PLANS);
     const rawSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
 
+    let loadedItems = rawItems ? JSON.parse(rawItems) : INITIAL_SEED_DATA.items;
+    let loadedTopics = rawTopics ? JSON.parse(rawTopics) : INITIAL_SEED_DATA.topics;
+    let loadedSubtopics = rawSubtopics ? JSON.parse(rawSubtopics) : INITIAL_SEED_DATA.subtopics;
+
+    if (rawSubtopics) {
+      const existingStIds = new Set(loadedSubtopics.map((st) => st.id));
+      const missingSubtopics = INITIAL_SEED_DATA.subtopics.filter((st) => !existingStIds.has(st.id));
+      if (missingSubtopics.length > 0) {
+        loadedSubtopics = [...loadedSubtopics, ...missingSubtopics];
+      }
+    }
+
+    if (rawItems) {
+      const itemMap = new Map(loadedItems.map((i) => [i.id, i]));
+      for (const seedItem of INITIAL_SEED_DATA.items) {
+        if (!itemMap.has(seedItem.id)) {
+          itemMap.set(seedItem.id, seedItem);
+        } else {
+          // If notes/url were empty in existing, update them with seed notes/url
+          const existing = itemMap.get(seedItem.id);
+          if (seedItem.notes === '') existing.notes = '';
+          else if (!existing.notes && seedItem.notes) existing.notes = seedItem.notes;
+          if (seedItem.url) existing.url = seedItem.url;
+          if (seedItem.subtopicId) existing.subtopicId = seedItem.subtopicId;
+          if (seedItem.done) {
+            existing.done = true;
+            existing.status = 'completed';
+          }
+          if (seedItem.revisionFlag) {
+            existing.revisionFlag = true;
+          }
+        }
+      }
+      loadedItems = Array.from(itemMap.values());
+    }
+
     return {
-      items: rawItems ? JSON.parse(rawItems) : INITIAL_SEED_DATA.items,
-      topics: rawTopics ? JSON.parse(rawTopics) : INITIAL_SEED_DATA.topics,
-      subtopics: rawSubtopics ? JSON.parse(rawSubtopics) : INITIAL_SEED_DATA.subtopics,
+      items: loadedItems,
+      topics: loadedTopics,
+      subtopics: loadedSubtopics,
       sessions: rawSessions ? JSON.parse(rawSessions) : [],
       plans: rawPlans ? JSON.parse(rawPlans) : [],
       settings: rawSettings ? { ...DEFAULT_SETTINGS, ...JSON.parse(rawSettings) } : DEFAULT_SETTINGS
