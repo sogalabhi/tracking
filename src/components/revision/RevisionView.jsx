@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { RotateCcw, CheckCircle2, Sparkles, Filter, ExternalLink } from 'lucide-react';
+import { RotateCcw, CheckCircle2, Sparkles, Filter, ExternalLink, Search } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { getDueRevisionQueue } from '../../services/spacedRepetition';
 import { ConfidenceMeter } from '../common/ConfidenceMeter';
@@ -9,12 +9,21 @@ import { ColdRecallGate } from './ColdRecallGate';
 export function RevisionView() {
   const { items, setConfidence, toggleDone, toggleRevisionFlag } = useApp();
   const [activeTab, setActiveTab] = useState('all'); // 'all' | 'manual' | 'auto'
+  const [searchQuery, setSearchQuery] = useState('');
 
   const dueQueue = getDueRevisionQueue(items);
 
   const filteredQueue = dueQueue.filter((item) => {
-    if (activeTab === 'manual') return item.revisionFlag;
-    if (activeTab === 'auto') return !item.revisionFlag && item.done;
+    if (activeTab === 'manual' && !item.revisionFlag) return false;
+    if (activeTab === 'auto' && (item.revisionFlag || !item.done)) return false;
+
+    if (searchQuery.trim()) {
+      const q = searchQuery.toLowerCase();
+      const matchesTitle = item.title.toLowerCase().includes(q);
+      const matchesNotes = (item.notes || '').toLowerCase().includes(q);
+      const matchesSubject = (item.subjectId || '').toLowerCase().includes(q);
+      if (!matchesTitle && !matchesNotes && !matchesSubject) return false;
+    }
     return true;
   });
 
@@ -22,7 +31,7 @@ export function RevisionView() {
     <div className="space-y-6">
       {/* Top Banner */}
       <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 shadow-xl flex flex-col md:flex-row items-center justify-between gap-4">
-        <div className="space-y-1">
+        <div className="space-y-1 flex-1">
           <div className="flex items-center gap-2">
             <span className="px-2.5 py-1 rounded-full bg-rose-950 text-rose-300 border border-rose-800/60 text-xs font-bold uppercase tracking-wider flex items-center gap-1">
               <RotateCcw className="w-3.5 h-3.5" /> Spaced Repetition Queue
@@ -36,25 +45,39 @@ export function RevisionView() {
           </p>
         </div>
 
-        {/* Filter Tabs */}
-        <div className="flex items-center gap-2">
-          {[
-            { id: 'all', label: `All Due (${dueQueue.length})` },
-            { id: 'manual', label: '☑ Manual Flags' },
-            { id: 'auto', label: 'Auto Spaced Decay' }
-          ].map((tab) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all ${
-                activeTab === tab.id
-                  ? 'bg-rose-600 border-rose-500 text-white shadow-md shadow-rose-600/30'
-                  : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
-              }`}
-            >
-              {tab.label}
-            </button>
-          ))}
+        {/* Search Input & Filter Tabs */}
+        <div className="flex flex-col sm:flex-row items-center gap-3 w-full md:w-auto">
+          {/* Search Bar */}
+          <div className="relative w-full sm:w-64">
+            <Search className="w-4 h-4 text-slate-500 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search due problems..."
+              className="w-full pl-9 pr-4 py-2 bg-slate-950 border border-slate-800 rounded-xl text-xs text-white placeholder-slate-500 focus:outline-none focus:border-rose-500 font-mono"
+            />
+          </div>
+
+          <div className="flex items-center gap-2 w-full sm:w-auto overflow-x-auto">
+            {[
+              { id: 'all', label: `All (${dueQueue.length})` },
+              { id: 'manual', label: '☑ Manual' },
+              { id: 'auto', label: 'Auto Decay' }
+            ].map((tab) => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`px-3 py-1.5 rounded-xl text-xs font-semibold border transition-all whitespace-nowrap ${
+                  activeTab === tab.id
+                    ? 'bg-rose-600 border-rose-500 text-white shadow-md shadow-rose-600/30'
+                    : 'bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                {tab.label}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
