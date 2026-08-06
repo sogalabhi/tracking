@@ -184,13 +184,6 @@ export function AppProvider({ children }) {
     }));
   };
 
-  const deleteSession = (sessionId) => {
-    setData((prev) => ({
-      ...prev,
-      sessions: prev.sessions.filter((s) => s.id !== sessionId)
-    }));
-  };
-
   const updateSettings = (newSettings) => {
     setData((prev) => ({
       ...prev,
@@ -216,6 +209,16 @@ export function AppProvider({ children }) {
     return true;
   };
 
+  const toggleTheme = () => {
+    setData((prev) => ({
+      ...prev,
+      settings: {
+        ...prev.settings,
+        theme: prev.settings.theme === 'light' ? 'dark' : 'light'
+      }
+    }));
+  };
+
   return (
     <AppContext.Provider
       value={{
@@ -225,6 +228,8 @@ export function AppProvider({ children }) {
         sessions: data.sessions,
         plans: data.plans,
         settings: data.settings,
+        theme: data.settings.theme || 'dark',
+        toggleTheme,
         activeTab,
         setActiveTab,
         selectedSubject,

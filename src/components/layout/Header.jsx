@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   CalendarDays,
   LayoutGrid,
@@ -12,7 +11,9 @@ import {
   Square,
   HelpCircle,
   Clock,
-  Target
+  Target,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useApp } from '../../context/AppContext';
 import { useTimer } from '../../context/TimerContext';
@@ -26,6 +27,8 @@ export function Header() {
     items,
     sessions,
     settings,
+    theme,
+    toggleTheme,
     setShowShortcutModal
   } = useApp();
 
@@ -179,6 +182,15 @@ export function Header() {
                 </span>
               </div>
             )}
+
+            {/* Light / Dark Mode Toggle */}
+            <button
+              onClick={toggleTheme}
+              className="p-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-amber-300 transition-colors flex items-center justify-center"
+              title={`Switch to ${theme === 'light' ? 'Dark' : 'Pastel Light'} Mode`}
+            >
+              {theme === 'light' ? <Moon className="w-4 h-4 text-indigo-400" /> : <Sun className="w-4 h-4 text-amber-400" />}
+            </button>
 
             <button
               onClick={() => setShowShortcutModal(true)}

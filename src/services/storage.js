@@ -16,7 +16,8 @@ export const DEFAULT_SETTINGS = {
   dDayTitle: 'Upcoming OAs & Placements',
   coldRecallGateDefault: true,
   idleTimeoutMinutes: 10,
-  autoAdvanceOnHotkey: true
+  autoAdvanceOnHotkey: true,
+  theme: 'dark' // 'dark' | 'light'
 };
 
 export function loadInitialAppData() {

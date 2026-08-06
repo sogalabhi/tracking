@@ -29,19 +29,31 @@ function MainContent() {
   );
 }
 
+function AppShell() {
+  const { theme } = useApp();
+
+  return (
+    <div className={`min-h-screen flex flex-col font-sans transition-colors duration-300 ${
+      theme === 'light'
+        ? 'theme-light bg-[#f4f8ff] text-slate-900 selection:bg-pink-300'
+        : 'theme-dark bg-slate-950 text-slate-100 selection:bg-indigo-500 selection:text-white'
+    }`}>
+      <Header />
+      <div className="flex flex-1">
+        <Sidebar />
+        <MainContent />
+      </div>
+      <ShortcutModal />
+      <ActiveTimerModal />
+    </div>
+  );
+}
+
 export default function App() {
   return (
     <AppProvider>
       <TimerProvider>
-        <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white">
-          <Header />
-          <div className="flex flex-1">
-            <Sidebar />
-            <MainContent />
-          </div>
-          <ShortcutModal />
-          <ActiveTimerModal />
-        </div>
+        <AppShell />
       </TimerProvider>
     </AppProvider>
   );
