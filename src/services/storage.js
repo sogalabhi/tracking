@@ -1,110 +1,78 @@
 import { INITIAL_SEED_DATA } from '../data/seedData';
-
-const STORAGE_KEYS = {
-  ITEMS: 'study_tracker_items_v1',
-  TOPICS: 'study_tracker_topics_v1',
-  SUBTOPICS: 'study_tracker_subtopics_v1',
-  TIME_SESSIONS: 'study_tracker_sessions_v1',
-  DAILY_PLANS: 'study_tracker_plans_v1',
-  SETTINGS: 'study_tracker_settings_v1'
-};
+import { db } from './firebase';
+import { doc, setDoc, deleteDoc } from 'firebase/firestore';
 
 export const DEFAULT_SETTINGS = {
   dailyTargetHours: 8,
   dailyTargetMaxHours: 10,
-  dDayDate: '2026-10-15', // Configurable target exam/OA date
+  dDayDate: '2026-10-15',
   dDayTitle: 'Upcoming OAs & Placements',
   coldRecallGateDefault: true,
   idleTimeoutMinutes: 10,
   autoAdvanceOnHotkey: true,
-  theme: 'dark' // 'dark' | 'light'
+  theme: 'dark'
 };
 
 export function loadInitialAppData() {
+  return {
+    items: INITIAL_SEED_DATA.items,
+    topics: INITIAL_SEED_DATA.topics,
+    subtopics: INITIAL_SEED_DATA.subtopics,
+    sessions: [],
+    plans: INITIAL_SEED_DATA.plans || [],
+    settings: DEFAULT_SETTINGS
+  };
+}
+
+// Background Firestore persistence helpers
+export async function syncItemToFirestore(item) {
   try {
-    const rawItems = localStorage.getItem(STORAGE_KEYS.ITEMS);
-    const rawTopics = localStorage.getItem(STORAGE_KEYS.TOPICS);
-    const rawSubtopics = localStorage.getItem(STORAGE_KEYS.SUBTOPICS);
-    const rawSessions = localStorage.getItem(STORAGE_KEYS.TIME_SESSIONS);
-    const rawPlans = localStorage.getItem(STORAGE_KEYS.DAILY_PLANS);
-    const rawSettings = localStorage.getItem(STORAGE_KEYS.SETTINGS);
-
-    let loadedItems = rawItems ? JSON.parse(rawItems) : INITIAL_SEED_DATA.items;
-    let loadedTopics = rawTopics ? JSON.parse(rawTopics) : INITIAL_SEED_DATA.topics;
-    let loadedSubtopics = rawSubtopics ? JSON.parse(rawSubtopics) : INITIAL_SEED_DATA.subtopics;
-
-    if (rawSubtopics) {
-      const existingStIds = new Set(loadedSubtopics.map((st) => st.id));
-      const missingSubtopics = INITIAL_SEED_DATA.subtopics.filter((st) => !existingStIds.has(st.id));
-      if (missingSubtopics.length > 0) {
-        loadedSubtopics = [...loadedSubtopics, ...missingSubtopics];
-      }
+    if (item && item.id) {
+      await setDoc(doc(db, 'items', item.id), item, { merge: true });
     }
-
-    if (rawItems) {
-      const itemMap = new Map(loadedItems.map((i) => [i.id, i]));
-      for (const seedItem of INITIAL_SEED_DATA.items) {
-        if (!itemMap.has(seedItem.id)) {
-          itemMap.set(seedItem.id, seedItem);
-        } else {
-          // If notes/url were empty in existing, update them with seed notes/url
-          const existing = itemMap.get(seedItem.id);
-          if (seedItem.notes === '') existing.notes = '';
-          else if (!existing.notes && seedItem.notes) existing.notes = seedItem.notes;
-          if (seedItem.url) existing.url = seedItem.url;
-          if (seedItem.subtopicId) existing.subtopicId = seedItem.subtopicId;
-          if (seedItem.done) {
-            existing.done = true;
-            existing.status = 'completed';
-          }
-          if (seedItem.revisionFlag) {
-            existing.revisionFlag = true;
-          }
-        }
-      }
-      loadedItems = Array.from(itemMap.values());
-    }
-
-    return {
-      items: loadedItems,
-      topics: loadedTopics,
-      subtopics: loadedSubtopics,
-      sessions: rawSessions ? JSON.parse(rawSessions) : [],
-      plans: rawPlans ? JSON.parse(rawPlans) : [],
-      settings: rawSettings ? { ...DEFAULT_SETTINGS, ...JSON.parse(rawSettings) } : DEFAULT_SETTINGS
-    };
   } catch (err) {
-    console.error('Failed loading local storage app data, fallback to seed', err);
-    return {
-      items: INITIAL_SEED_DATA.items,
-      topics: INITIAL_SEED_DATA.topics,
-      subtopics: INITIAL_SEED_DATA.subtopics,
-      sessions: [],
-      plans: [],
-      settings: DEFAULT_SETTINGS
-    };
+    console.error('Failed to sync item to Firestore:', err);
   }
 }
 
-export function saveItemsToStorage(items) {
-  localStorage.setItem(STORAGE_KEYS.ITEMS, JSON.stringify(items));
+export async function syncPlanToFirestore(plan) {
+  try {
+    if (plan && plan.id) {
+      await setDoc(doc(db, 'plans', plan.id), plan, { merge: true });
+    }
+  } catch (err) {
+    console.error('Failed to sync plan to Firestore:', err);
+  }
 }
 
-export function saveTopicsToStorage(topics, subtopics) {
-  localStorage.setItem(STORAGE_KEYS.TOPICS, JSON.stringify(topics));
-  localStorage.setItem(STORAGE_KEYS.SUBTOPICS, JSON.stringify(subtopics));
+export async function deletePlanFromFirestore(planId) {
+  try {
+    if (planId) {
+      await deleteDoc(doc(db, 'plans', planId));
+    }
+  } catch (err) {
+    console.error('Failed to delete plan from Firestore:', err);
+  }
 }
 
-export function saveSessionsToStorage(sessions) {
-  localStorage.setItem(STORAGE_KEYS.TIME_SESSIONS, JSON.stringify(sessions));
+export async function syncSessionToFirestore(session) {
+  try {
+    if (session && session.id) {
+      await setDoc(doc(db, 'sessions', session.id), session, { merge: true });
+    }
+  } catch (err) {
+    console.error('Failed to sync session to Firestore:', err);
+  }
 }
 
-export function savePlansToStorage(plans) {
-  localStorage.setItem(STORAGE_KEYS.DAILY_PLANS, JSON.stringify(plans));
-}
-
-export function saveSettingsToStorage(settings) {
-  localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(settings));
+export async function syncSettingsToFirestore(settings) {
+  try {
+    if (settings) {
+      await setDoc(doc(db, 'settings', 'user_settings'), settings, { merge: true });
+    }
+  } catch (err) {
+    console.error('Failed to sync settings to Firestore:', err);
+  }
 }
 
 export function exportBackupJSON(appState) {
@@ -129,11 +97,5 @@ export function exportBackupJSON(appState) {
 }
 
 export function resetAppToSeedData() {
-  localStorage.removeItem(STORAGE_KEYS.ITEMS);
-  localStorage.removeItem(STORAGE_KEYS.TOPICS);
-  localStorage.removeItem(STORAGE_KEYS.SUBTOPICS);
-  localStorage.removeItem(STORAGE_KEYS.TIME_SESSIONS);
-  localStorage.removeItem(STORAGE_KEYS.DAILY_PLANS);
-  localStorage.removeItem(STORAGE_KEYS.SETTINGS);
   return loadInitialAppData();
 }

@@ -1,4 +1,4 @@
-import { DEFAULT_PROJECT_PROMPTS } from './defaultPrompts';
+import { DEFAULT_PROJECT_PROMPTS } from './defaultPrompts.js';
 
 export const SUBJECTS = [
   { id: 'dsa', name: 'DSA', icon: 'Code2', color: 'indigo', description: 'Data Structures & Algorithms (17 Patterns)' },
@@ -7708,8 +7708,30 @@ export const INITIAL_SEED_DATA = {
       confidence: 1,
       attempts: 0,
       notes: ''
-    },
+    }
+  ],
 
-
+  plans: [
+    { id: 'bt_plan_1', itemId: 'dsa_level_order_traversal', title: 'Level Order Traversal', subjectId: 'dsa', completed: false, order: 1 },
+    { id: 'bt_plan_2', itemId: 'dsa_iterative_inorder_traversal_of_binary_tree', title: 'Iterative Inorder Traversal of Binary Tree', subjectId: 'dsa', completed: false, order: 2 },
+    { id: 'bt_plan_3', itemId: 'dsa_maximum_depth_in_bt', title: 'Maximum Depth in BT', subjectId: 'dsa', completed: false, order: 3 },
+    { id: 'bt_plan_4', itemId: 'dsa_check_for_balanced_binary_tree', title: 'Check for balanced binary tree', subjectId: 'dsa', completed: false, order: 4 },
+    { id: 'bt_plan_5', itemId: 'dsa_diameter_of_binary_tree', title: 'Diameter of Binary Tree', subjectId: 'dsa', completed: false, order: 5 },
+    { id: 'bt_plan_6', itemId: 'dsa_maximum_path_sum', title: 'Maximum path sum', subjectId: 'dsa', completed: false, order: 6 },
+    { id: 'bt_plan_7', itemId: 'dsa_check_if_two_trees_are_identical_or_not', title: 'Check if two trees are identical or not', subjectId: 'dsa', completed: false, order: 7 },
+    { id: 'bt_plan_8', itemId: 'dsa_symmetric_binary_tree', title: 'Symmetric Binary Tree', subjectId: 'dsa', completed: false, order: 8 },
+    { id: 'bt_plan_9', itemId: 'dsa_print_root_to_leaf_path_in_bt', title: 'Print root to leaf path in BT', subjectId: 'dsa', completed: false, order: 9 },
+    { id: 'bt_plan_10', itemId: 'dsa_zig_zag_or_spiral_traversal', title: 'Zig Zag or Spiral Traversal', subjectId: 'dsa', completed: false, order: 10 },
+    { id: 'bt_plan_11', itemId: 'dsa_boundary_traversal', title: 'Boundary Traversal', subjectId: 'dsa', completed: false, order: 11 },
+    { id: 'bt_plan_12', itemId: 'dsa_vertical_order_traversal', title: 'Vertical Order Traversal', subjectId: 'dsa', completed: false, order: 12 },
+    { id: 'bt_plan_13', itemId: 'dsa_top_view_of_bt', title: 'Top View of BT', subjectId: 'dsa', completed: false, order: 13 },
+    { id: 'bt_plan_14', itemId: 'dsa_bottom_view_of_bt', title: 'Bottom view of BT', subjectId: 'dsa', completed: false, order: 14 },
+    { id: 'bt_plan_15', itemId: 'dsa_right_left_view_of_binary_tree', title: 'Right/Left View of Binary Tree', subjectId: 'dsa', completed: false, order: 15 },
+    { id: 'bt_plan_16', itemId: 'dsa_lca_in_bt', title: 'LCA in BT', subjectId: 'dsa', completed: false, order: 16 },
+    { id: 'bt_plan_17', itemId: 'dsa_print_all_nodes_at_a_distance_of_k_in_bt', title: 'Print all nodes at a distance of K in BT', subjectId: 'dsa', completed: false, order: 17 },
+    { id: 'bt_plan_18', itemId: 'dsa_construct_a_bt_from_preorder_and_inorder', title: 'Construct a BT from Preorder and Inorder', subjectId: 'dsa', completed: false, order: 18 },
+    { id: 'bt_plan_19', itemId: 'dsa_morris_inorder_traversal_of_a_binary_tree', title: 'Morris Inorder Traversal of a Binary Tree', subjectId: 'dsa', completed: false, order: 19 }
   ]
 };
+
+

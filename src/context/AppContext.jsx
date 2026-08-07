@@ -1,50 +1,84 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import {
   loadInitialAppData,
-  saveItemsToStorage,
-  saveSessionsToStorage,
-  savePlansToStorage,
-  saveSettingsToStorage,
+  syncItemToFirestore,
+  syncPlanToFirestore,
+  deletePlanFromFirestore,
+  syncSessionToFirestore,
+  syncSettingsToFirestore,
   resetAppToSeedData
 } from '../services/storage';
+import { db } from '../services/firebase';
+import { collection, onSnapshot } from 'firebase/firestore';
 import { calculateNextDue, getTodayDateString } from '../services/spacedRepetition';
 
 const AppContext = createContext(null);
 
 export function AppProvider({ children }) {
   const [data, setData] = useState(() => loadInitialAppData());
-  const [activeTab, setActiveTab] = useState('today'); // 'today' | 'tracker' | 'planner' | 'revision' | 'calendar' | 'insights' | 'data'
+  const [activeTab, setActiveTab] = useState('today');
   const [selectedSubject, setSelectedSubject] = useState('dsa');
   const [selectedItemId, setSelectedItemId] = useState(null);
   const [showShortcutModal, setShowShortcutModal] = useState(false);
 
-  // Sync to local storage
+  // Real-time Firestore Subscriptions for all domains
   useEffect(() => {
-    saveItemsToStorage(data.items);
-  }, [data.items]);
+    const unsubPlans = onSnapshot(collection(db, 'plans'), (snap) => {
+      if (!snap.empty) {
+        const remote = [];
+        snap.forEach((d) => remote.push(d.data()));
+        setData((prev) => ({ ...prev, plans: remote }));
+      }
+    });
 
-  useEffect(() => {
-    saveSessionsToStorage(data.sessions);
-  }, [data.sessions]);
+    const unsubItems = onSnapshot(collection(db, 'items'), (snap) => {
+      if (!snap.empty) {
+        const itemMap = new Map();
+        snap.forEach((d) => itemMap.set(d.id, d.data()));
+        setData((prev) => {
+          const merged = prev.items.map((i) => (itemMap.has(i.id) ? { ...i, ...itemMap.get(i.id) } : i));
+          return { ...prev, items: merged };
+        });
+      }
+    });
 
-  useEffect(() => {
-    savePlansToStorage(data.plans);
-  }, [data.plans]);
+    const unsubSessions = onSnapshot(collection(db, 'sessions'), (snap) => {
+      if (!snap.empty) {
+        const remote = [];
+        snap.forEach((d) => remote.push(d.data()));
+        setData((prev) => ({ ...prev, sessions: remote }));
+      }
+    });
 
-  useEffect(() => {
-    saveSettingsToStorage(data.settings);
-  }, [data.settings]);
+    const unsubSettings = onSnapshot(collection(db, 'settings'), (snap) => {
+      if (!snap.empty) {
+        const setSnap = snap.docs.find((d) => d.id === 'user_settings');
+        if (setSnap) {
+          setData((prev) => ({ ...prev, settings: { ...prev.settings, ...setSnap.data() } }));
+        }
+      }
+    });
 
-  // Actions
+    return () => {
+      unsubPlans();
+      unsubItems();
+      unsubSessions();
+      unsubSettings();
+    };
+  }, []);
+
+  // Optimistic Mutations + Background Firestore Sync
   const toggleDone = (itemId) => {
     const todayStr = getTodayDateString();
+    let updatedItem = null;
+
     setData((prev) => {
       const updated = prev.items.map((item) => {
         if (item.id === itemId) {
           const nextDone = !item.done;
           const nextConf = nextDone ? Math.max(item.confidence, 3) : item.confidence;
-          const nextStatus = nextDone ? 'solved_clean' : 'not_started';
-          return {
+          const nextStatus = nextDone ? 'completed' : 'not_started';
+          updatedItem = {
             ...item,
             done: nextDone,
             status: nextStatus,
@@ -53,52 +87,70 @@ export function AppProvider({ children }) {
             lastTouched: todayStr,
             nextDue: calculateNextDue(nextConf, new Date())
           };
+          return updatedItem;
         }
         return item;
       });
       return { ...prev, items: updated };
     });
+
+    if (updatedItem) {
+      syncItemToFirestore(updatedItem);
+    }
   };
 
   const toggleRevisionFlag = (itemId) => {
+    let updatedItem = null;
     setData((prev) => {
       const updated = prev.items.map((item) => {
         if (item.id === itemId) {
-          return {
+          updatedItem = {
             ...item,
             revisionFlag: !item.revisionFlag,
             lastTouched: getTodayDateString()
           };
+          return updatedItem;
         }
         return item;
       });
       return { ...prev, items: updated };
     });
+
+    if (updatedItem) {
+      syncItemToFirestore(updatedItem);
+    }
   };
 
   const setConfidence = (itemId, rating) => {
     const todayStr = getTodayDateString();
+    let updatedItem = null;
     setData((prev) => {
       const updated = prev.items.map((item) => {
         if (item.id === itemId) {
-          return {
+          updatedItem = {
             ...item,
             confidence: rating,
             lastTouched: todayStr,
             nextDue: calculateNextDue(rating, new Date())
           };
+          return updatedItem;
         }
         return item;
       });
       return { ...prev, items: updated };
     });
+
+    if (updatedItem) {
+      syncItemToFirestore(updatedItem);
+    }
   };
 
   const updateItemDetails = (itemId, { notes, mistakeTag, difficulty, title, url }) => {
+    let updatedItem = null;
     setData((prev) => {
       const updated = prev.items.map((item) => {
         if (item.id === itemId) {
-          return {
+          updatedItem = {
             ...item,
             notes: notes !== undefined ? notes : item.notes,
             mistakeTag: mistakeTag !== undefined ? mistakeTag : item.mistakeTag,
@@ -107,11 +159,16 @@ export function AppProvider({ children }) {
             url: url !== undefined ? url : item.url,
             lastTouched: getTodayDateString()
           };
+          return updatedItem;
         }
         return item;
       });
       return { ...prev, items: updated };
     });
+
+    if (updatedItem) {
+      syncItemToFirestore(updatedItem);
+    }
   };
 
   const addItemToTodayPlan = (item) => {
@@ -130,13 +187,26 @@ export function AppProvider({ children }) {
       ...prev,
       plans: [...prev.plans, newPlan]
     }));
+
+    syncPlanToFirestore(newPlan);
   };
 
   const togglePlanCompleted = (planId) => {
+    let updatedPlan = null;
     setData((prev) => ({
       ...prev,
-      plans: prev.plans.map((p) => (p.id === planId ? { ...p, completed: !p.completed } : p))
+      plans: prev.plans.map((p) => {
+        if (p.id === planId) {
+          updatedPlan = { ...p, completed: !p.completed };
+          return updatedPlan;
+        }
+        return p;
+      })
     }));
+
+    if (updatedPlan) {
+      syncPlanToFirestore(updatedPlan);
+    }
   };
 
   const deletePlanItem = (planId) => {
@@ -144,17 +214,29 @@ export function AppProvider({ children }) {
       ...prev,
       plans: prev.plans.filter((p) => p.id !== planId)
     }));
+    deletePlanFromFirestore(planId);
   };
 
   const pushPlanToTomorrow = (planId) => {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
     const tomorrowStr = tomorrow.toISOString().split('T')[0];
+    let updatedPlan = null;
 
     setData((prev) => ({
       ...prev,
-      plans: prev.plans.map((p) => (p.id === planId ? { ...p, date: tomorrowStr } : p))
+      plans: prev.plans.map((p) => {
+        if (p.id === planId) {
+          updatedPlan = { ...p, date: tomorrowStr };
+          return updatedPlan;
+        }
+        return p;
+      })
     }));
+
+    if (updatedPlan) {
+      syncPlanToFirestore(updatedPlan);
+    }
   };
 
   const pushAllUnfinishedToTomorrow = () => {
@@ -165,7 +247,14 @@ export function AppProvider({ children }) {
 
     setData((prev) => ({
       ...prev,
-      plans: prev.plans.map((p) => (p.date === todayStr && !p.completed ? { ...p, date: tomorrowStr } : p))
+      plans: prev.plans.map((p) => {
+        if (p.date === todayStr && !p.completed) {
+          const updated = { ...p, date: tomorrowStr };
+          syncPlanToFirestore(updated);
+          return updated;
+        }
+        return p;
+      })
     }));
   };
 
@@ -182,6 +271,8 @@ export function AppProvider({ children }) {
       ...prev,
       sessions: [newSession, ...prev.sessions]
     }));
+
+    syncSessionToFirestore(newSession);
   };
 
   const deleteSession = (sessionId) => {
@@ -189,13 +280,16 @@ export function AppProvider({ children }) {
       ...prev,
       sessions: prev.sessions.filter((s) => s.id !== sessionId)
     }));
+    deletePlanFromFirestore(sessionId);
   };
 
   const updateSettings = (newSettings) => {
+    const merged = { ...data.settings, ...newSettings };
     setData((prev) => ({
       ...prev,
-      settings: { ...prev.settings, ...newSettings }
+      settings: merged
     }));
+    syncSettingsToFirestore(merged);
   };
 
   const handleResetDatabase = () => {
@@ -217,13 +311,13 @@ export function AppProvider({ children }) {
   };
 
   const toggleTheme = () => {
+    const newTheme = data.settings.theme === 'light' ? 'dark' : 'light';
+    const updatedSettings = { ...data.settings, theme: newTheme };
     setData((prev) => ({
       ...prev,
-      settings: {
-        ...prev.settings,
-        theme: prev.settings.theme === 'light' ? 'dark' : 'light'
-      }
+      settings: updatedSettings
     }));
+    syncSettingsToFirestore(updatedSettings);
   };
 
   return (
