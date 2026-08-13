@@ -14,14 +14,21 @@ export function calculateStudyStreak(sessions = []) {
   const today = new Date();
   let checkDate = new Date(today);
 
+  function getLocalDateStr(d) {
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  }
+
   // Check today first, if no logs today, check yesterday to allow active streak
-  const todayStr = checkDate.toISOString().split('T')[0];
+  const todayStr = getLocalDateStr(checkDate);
   if (!datesWithLogs.has(todayStr)) {
     checkDate.setDate(checkDate.getDate() - 1);
   }
 
   while (true) {
-    const dStr = checkDate.toISOString().split('T')[0];
+    const dStr = getLocalDateStr(checkDate);
     if (datesWithLogs.has(dStr)) {
       currentStreak++;
       checkDate.setDate(checkDate.getDate() - 1);

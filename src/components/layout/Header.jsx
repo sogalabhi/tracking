@@ -42,7 +42,8 @@ export function Header() {
     formatTime
   } = useTimer();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const headerNow = new Date();
+  const todayStr = `${headerNow.getFullYear()}-${String(headerNow.getMonth() + 1).padStart(2, '0')}-${String(headerNow.getDate()).padStart(2, '0')}`;
   const todaySeconds = getTotalSecondsForDate(sessions, todayStr) + (activeTimer.isRunning ? elapsedDisplaySeconds : 0);
   const todayHours = (todaySeconds / 3600).toFixed(1);
   const targetMin = settings.dailyTargetHours || 8;

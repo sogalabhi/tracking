@@ -6,6 +6,14 @@ export const CONFIDENCE_INTERVALS = {
   5: 21  // 3 weeks
 };
 
+export function formatLocalDate(d = new Date()) {
+  const dateObj = typeof d === 'string' ? new Date(d) : d;
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 /**
  * Calculates next due date based on confidence level & touched date
  */
@@ -13,14 +21,14 @@ export function calculateNextDue(confidence = 1, baseDate = new Date()) {
   const daysToAdd = CONFIDENCE_INTERVALS[confidence] || 1;
   const target = new Date(baseDate);
   target.setDate(target.getDate() + daysToAdd);
-  return target.toISOString().split('T')[0];
+  return formatLocalDate(target);
 }
 
 /**
- * Returns formatted YYYY-MM-DD for today
+ * Returns formatted YYYY-MM-DD for today in local timezone
  */
 export function getTodayDateString() {
-  return new Date().toISOString().split('T')[0];
+  return formatLocalDate(new Date());
 }
 
 /**

@@ -35,14 +35,21 @@ const DEFAULT_SETTINGS = {
   theme: 'dark'
 };
 
+function getLocalDateStr(dateObj = new Date()) {
+  const year = dateObj.getFullYear();
+  const month = String(dateObj.getMonth() + 1).padStart(2, '0');
+  const day = String(dateObj.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
 function resolveDateStr(inputDate) {
   if (!inputDate || inputDate === 'today') {
-    return new Date().toISOString().split('T')[0];
+    return getLocalDateStr(new Date());
   }
   if (inputDate === 'tomorrow') {
     const d = new Date();
     d.setDate(d.getDate() + 1);
-    return d.toISOString().split('T')[0];
+    return getLocalDateStr(d);
   }
   return inputDate;
 }
@@ -91,18 +98,18 @@ async function addPlanItem(title, dateInput, subjectId = 'dsa') {
   console.log(`\nAdded task to ${dateStr}: "${planObj.title}"`);
 }
 
-async function planTopic(topicId, limit = 5, dateInput = 'tomorrow') {
+async function planTopic(topicId, limit = 5, dateInput = 'tomorrow', forceAll = false) {
   const dateStr = resolveDateStr(dateInput);
-  const uncompletedInTopic = INITIAL_SEED_DATA.items.filter(
-    (i) => i.topicId === topicId && !i.done
+  const topicItems = INITIAL_SEED_DATA.items.filter(
+    (i) => i.topicId === topicId && (forceAll || !i.done)
   );
 
-  if (uncompletedInTopic.length === 0) {
-    console.log(`\nNo uncompleted problems found for topic: ${topicId}`);
+  if (topicItems.length === 0) {
+    console.log(`\nNo problems found for topic: ${topicId}`);
     return;
   }
 
-  const toAdd = uncompletedInTopic.slice(0, parseInt(limit, 10));
+  const toAdd = topicItems.slice(0, parseInt(limit, 10));
   console.log(`\nQueuing ${toAdd.length} problems from topic "${topicId}" to ${dateStr}...`);
 
   for (let idx = 0; idx < toAdd.length; idx++) {
@@ -136,6 +143,28 @@ async function clearDatePlans(dateInput) {
     count++;
   }
   console.log(`Cleared ${count} tasks for ${dateStr}.`);
+}
+
+async function movePlans(fromDateInput, toDateInput) {
+  const fromDateStr = resolveDateStr(fromDateInput);
+  const toDateStr = resolveDateStr(toDateInput);
+
+  console.log(`\nMoving all plans from ${fromDateStr} to ${toDateStr}...`);
+  const q = query(collection(db, 'plans'), where('date', '==', fromDateStr));
+  const snap = await getDocs(q);
+
+  if (snap.empty) {
+    console.log(`No plans found for date: ${fromDateStr}`);
+    return;
+  }
+
+  let count = 0;
+  for (const docSnap of snap.docs) {
+    const data = docSnap.data();
+    await setDoc(doc(db, 'plans', docSnap.id), { ...data, date: toDateStr });
+    count++;
+  }
+  console.log(`Successfully moved ${count} tasks from ${fromDateStr} to ${toDateStr}.\n`);
 }
 
 async function seedDatabase() {
@@ -236,17 +265,23 @@ async function main() {
       }
       await addPlanItem(title, getArg('--date', 'today'));
     } else if (command === 'plan') {
+      const isForce = args.includes('--force') || args.includes('--all');
       await planTopic(
         getArg('--topic', 'dsa_trees'),
         getArg('--limit', 5),
-        getArg('--date', 'tomorrow')
+        getArg('--date', 'tomorrow'),
+        isForce
       );
     } else if (command === 'clear') {
       await clearDatePlans(getArg('--date', 'today'));
+    } else if (command === 'move') {
+      const fromVal = getArg('--from', '2026-08-08');
+      const toVal = getArg('--to', '2026-08-14');
+      await movePlans(fromVal, toVal);
     } else if (command === 'status') {
       await showStatus();
     } else {
-      console.log('Available commands: seed, list, add, plan, clear, status');
+      console.log('Available commands: seed, list, add, plan, clear, move, status');
     }
   } catch (err) {
     console.error('CLI Execution Error:', err);

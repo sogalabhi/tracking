@@ -32,7 +32,8 @@ export function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const sidebarNow = new Date();
+  const todayStr = `${sidebarNow.getFullYear()}-${String(sidebarNow.getMonth() + 1).padStart(2, '0')}-${String(sidebarNow.getDate()).padStart(2, '0')}`;
   const todaySeconds = getTotalSecondsForDate(sessions, todayStr);
 
   const handleSelectSubject = (subId) => {

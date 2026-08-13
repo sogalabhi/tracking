@@ -30,7 +30,8 @@ export function TodayView() {
 
   const { activeTimer, elapsedDisplaySeconds, startTimer, formatTime } = useTimer();
 
-  const todayStr = new Date().toISOString().split('T')[0];
+  const now = new Date();
+  const todayStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
   const todaySeconds = getTotalSecondsForDate(sessions, todayStr) + (activeTimer.isRunning ? elapsedDisplaySeconds : 0);
   const todayHours = (todaySeconds / 3600).toFixed(1);
 
